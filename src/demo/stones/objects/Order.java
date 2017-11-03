@@ -15,9 +15,15 @@ public class Order {
 	/** time then order was matched */
 	private Date matchTime;
 	/** Is order matched or not */
-	private boolean matched;
+	private volatile boolean matched;
 	/** Second order */
 	private Order matchedOrder;
+	
+	/** Method can be called by 2 threads at once */
+	public synchronized boolean registerMatch() {
+		if(matched) return false;
+		return matched = true; //Note this is assignment
+	}
 	
 	public String toString() {
 		StringBuilder result = new StringBuilder();
@@ -52,6 +58,9 @@ public class Order {
 		}
 		result.append("€");
 		return result.toString();
+	}
+	public BigDecimal getPrice() {
+		return sellPrice == null ? buyPrice : sellPrice;
 	}
 	public Order() {
 		
